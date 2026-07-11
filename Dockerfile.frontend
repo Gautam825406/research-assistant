@@ -1,0 +1,26 @@
+# Frontend image — Streamlit UI (frontend/)
+FROM python:3.12-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir uv
+
+WORKDIR /app
+
+# Installs the full project dependency set (this is a single-package repo shared with the
+# backend), so this image is larger than strictly necessary for a UI-only service — see
+# DEPLOYMENT.md "Image size" for the trade-off and how to slim it down.
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev --no-install-project
+
+COPY frontend ./frontend
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+EXPOSE 8501
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD curl -f http://localhost:8501/_stcore/health || exit 1
+
+CMD ["uv", "run", "streamlit", "run", "frontend/app.py", "--server.address=0.0.0.0", "--server.port=8501"]
