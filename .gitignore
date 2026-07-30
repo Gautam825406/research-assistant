@@ -8,13 +8,14 @@ wheels/
 
 # Virtual environments
 .venv
+node_modules/
 
 # Environment variables
 .env
 
 # Vector store artifacts
-vector_db/*
-!vector_db/.gitkeep
+backend/vector_db/*
+!backend/vector_db/.gitkeep
 
 # Logs
 *.log

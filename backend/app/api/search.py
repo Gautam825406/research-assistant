@@ -44,7 +44,10 @@ async def search(request: SearchRequest) -> SearchResponse:
     if not results:
         raise HTTPException(
             status_code=502,
-            detail="Web search returned no results. Try rephrasing the query.",
+            detail=(
+                "The web search provider is unavailable or returned no results. "
+                "Check the backend's internet connection, then try again."
+            ),
         )
 
     scraped_contents = await asyncio.gather(
